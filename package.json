@@ -1,0 +1,18 @@
+{
+  "name": "roomdock",
+  "version": "1.0.0",
+  "description": "Private real-time rooms with chat, files, and folder uploads",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "busboy": "^1.6.0",
+    "express": "^5.2.1",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.3"
+  }
+}

@@ -1,0 +1,333 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="RoomDock is a private room web app for chat, file sharing, and folder uploads."
+    />
+    <title>RoomDock</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
+    <div class="shell">
+      <header class="hero">
+        <div class="brand-row">
+          <div class="brand-mark" aria-hidden="true">RD</div>
+          <div>
+            <p class="eyebrow">Private rooms for chat and files</p>
+            <h1>RoomDock</h1>
+          </div>
+        </div>
+        <p class="hero-copy">
+          Create a private room, share a room code and password, chat in real time, and
+          drop files or entire folders into one friendly workspace.
+        </p>
+        <div class="hero-pills" aria-label="Room highlights">
+          <span class="pill">10 people max</span>
+          <span class="pill">Real-time chat</span>
+          <span class="pill">Files + folders</span>
+          <span class="pill">Up to 100 GB per file</span>
+        </div>
+      </header>
+
+      <section class="resume-card card hidden" id="resumeCard">
+        <div>
+          <p class="card-kicker">Session safety</p>
+          <h2>Refreshing closes your seat</h2>
+          <p class="muted" id="resumeSummary">
+            You will need to enter the room code, your name, and the password again after a refresh.
+          </p>
+        </div>
+        <div class="resume-actions">
+          <button class="btn btn-primary" id="resumeButton" type="button">Reconnect</button>
+          <button class="btn btn-ghost" id="clearResumeButton" type="button">Close seat</button>
+        </div>
+      </section>
+
+      <section class="landing-grid" id="landingSection">
+        <article class="card form-card">
+          <div class="card-head">
+            <p class="card-kicker">Create a server</p>
+            <h2>Start a private room</h2>
+          </div>
+          <form id="createForm" class="stack-form" autocomplete="off">
+            <label>
+              <span>Room name</span>
+              <input id="createRoomName" name="roomName" type="text" placeholder="Project room" required />
+            </label>
+            <label>
+              <span>Your name</span>
+              <input id="createHostName" name="hostName" type="text" placeholder="Alex" required />
+            </label>
+            <label>
+              <span>Password</span>
+              <input
+                id="createPassword"
+                name="password"
+                type="password"
+                placeholder="Choose a room password"
+                minlength="4"
+                required
+              />
+            </label>
+            <p class="form-note">
+              Share the room code and password with your group. Everyone must enter a name to join.
+            </p>
+            <button class="btn btn-primary btn-block" type="submit" id="createSubmit">Create room</button>
+          </form>
+        </article>
+
+        <article class="card form-card">
+          <div class="card-head">
+            <p class="card-kicker">Join a server</p>
+            <h2>Enter the room code and password</h2>
+          </div>
+          <form id="joinForm" class="stack-form" autocomplete="off">
+            <label>
+              <span>Room code</span>
+              <input id="joinRoomCode" name="roomCode" type="text" placeholder="ABC123" required />
+            </label>
+            <label>
+              <span>Your name</span>
+              <input id="joinName" name="name" type="text" placeholder="Jordan" required />
+            </label>
+            <label>
+              <span>Password</span>
+              <input id="joinPassword" name="password" type="password" placeholder="Ask the host" required />
+            </label>
+            <p class="form-note">
+              The host gives out the password. A room can hold up to 10 people at once. Refreshing the page means everyone must sign in again.
+            </p>
+            <button class="btn btn-secondary btn-block" type="submit" id="joinSubmit">Join room</button>
+          </form>
+        </article>
+
+        <article class="card tips-card">
+          <div class="card-head">
+            <p class="card-kicker">How it works</p>
+            <h2>Simple, fast, and easy to follow</h2>
+          </div>
+          <ol class="steps">
+            <li>Create a room or join with a room code, your name, and the password.</li>
+            <li>Chat in the middle panel and keep everyone on the same page.</li>
+            <li>Use the file panel to upload files or whole folders.</li>
+            <li>Large uploads stream straight to disk, up to 100 GB per file.</li>
+          </ol>
+        </article>
+      </section>
+
+      <section class="room-shell hidden" id="roomSection">
+        <header class="room-header card">
+          <div class="room-header-copy">
+            <p class="card-kicker">Live room</p>
+            <h2 id="roomTitle">Room</h2>
+            <p class="muted" id="roomSubtitle">Waiting to connect...</p>
+          </div>
+
+          <div class="room-meta">
+            <div class="meta-chip">
+              <span class="meta-label">Code</span>
+              <strong id="roomCodeValue">---</strong>
+            </div>
+            <div class="meta-chip">
+              <span class="meta-label">Password</span>
+              <strong id="roomPasswordValue">Hidden</strong>
+            </div>
+            <div class="meta-chip">
+              <span class="meta-label">People</span>
+              <strong id="roomMembersValue">0 / 10</strong>
+            </div>
+            <div class="meta-chip">
+              <span class="meta-label">Library</span>
+              <strong id="roomStorageValue">0 B</strong>
+            </div>
+          </div>
+
+          <div class="room-actions">
+            <button class="btn btn-ghost" id="copyInviteButton" type="button">Share room</button>
+            <button class="btn btn-ghost" id="togglePasswordButton" type="button">Show password</button>
+            <button class="btn btn-danger" id="leaveButton" type="button">Leave room</button>
+          </div>
+        </header>
+
+        <div class="room-grid">
+          <aside class="card panel members-panel">
+            <div class="panel-head">
+              <div>
+                <p class="card-kicker">Members</p>
+                <h3>Who is here</h3>
+              </div>
+              <span class="small-pill" id="memberCountBadge">0 people</span>
+            </div>
+            <p class="form-note compact">Only the host sees kick and transfer controls.</p>
+            <div class="member-list" id="membersList"></div>
+          </aside>
+
+          <main class="card panel chat-panel">
+            <div class="panel-head">
+              <div>
+                <p class="card-kicker">Chat</p>
+                <h3>Talk in real time</h3>
+              </div>
+              <span class="small-pill">Enter sends</span>
+            </div>
+            <div class="message-list" id="messageList" aria-live="polite"></div>
+            <form class="message-form" id="messageForm">
+              <textarea id="messageInput" rows="1" placeholder="Write a message to the room..."></textarea>
+              <button class="btn btn-primary" type="submit">Send</button>
+            </form>
+          </main>
+
+          <aside class="card panel files-panel">
+            <div class="panel-head">
+              <div>
+                <p class="card-kicker">Files</p>
+                <h3>Drop and share</h3>
+              </div>
+              <span class="small-pill">100 GB/file</span>
+            </div>
+            <div class="files-toolbar">
+              <label class="search-field">
+                <span>Search files and folders</span>
+                <input
+                  id="fileSearchInput"
+                  type="search"
+                  placeholder="Search by name, folder, uploader, or type"
+                  autocomplete="off"
+                />
+              </label>
+              <button class="btn btn-ghost btn-mini" id="fileSearchClearButton" type="button">Clear</button>
+            </div>
+            <p class="form-note compact" id="fileSearchSummary">
+              Search across uploaded files, folders, uploaders, and file types.
+            </p>
+            <div class="drop-zone" id="dropZone">
+              <p class="drop-title">Drop files here</p>
+              <p class="drop-copy">
+                Use the buttons below to add files or a whole folder. Folder structure is kept intact.
+              </p>
+              <div class="drop-actions">
+                <button class="btn btn-secondary" id="pickFilesButton" type="button">Add files</button>
+                <button class="btn btn-secondary" id="pickFolderButton" type="button">Add folder</button>
+              </div>
+              <input id="fileInput" type="file" multiple class="hidden" />
+              <input id="folderInput" type="file" multiple webkitdirectory class="hidden" />
+            </div>
+            <p class="form-note compact">
+              Files stream directly to the server. A single file can be as large as 100 GB, and folder uploads are
+              shown as one folder card below.
+            </p>
+            <div class="folder-section">
+              <div class="folder-head">
+                <div>
+                  <p class="card-kicker">Folders</p>
+                  <h3>Folder and room archives</h3>
+                </div>
+                <div class="folder-head-actions">
+                  <span class="small-pill">Preserves folder structure</span>
+                  <button class="btn btn-ghost btn-mini" id="roomZipButton" type="button">Download room ZIP</button>
+                </div>
+              </div>
+              <div class="folder-list" id="folderList"></div>
+            </div>
+            <div class="upload-queue" id="uploadQueue"></div>
+            <div class="file-list" id="fileList"></div>
+          </aside>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-layer hidden" id="roomToolsModal" aria-hidden="true">
+      <div class="modal-backdrop" id="roomToolsBackdrop"></div>
+      <section class="modal-window card" role="dialog" aria-modal="true" aria-labelledby="roomToolsHeading">
+        <header class="modal-head">
+          <div>
+            <p class="card-kicker">Room tools</p>
+            <h2 id="roomToolsHeading">Share and settings</h2>
+          </div>
+          <button class="btn btn-ghost btn-mini" id="roomToolsCloseButton" type="button">Close</button>
+        </header>
+
+        <div class="modal-grid">
+          <section class="modal-section">
+            <div class="section-head">
+              <div>
+                <p class="card-kicker">Invite</p>
+                <h3>Share the room</h3>
+              </div>
+            </div>
+
+            <div class="share-grid">
+              <label class="copy-field">
+                <span>Invite link</span>
+                <div class="copy-row">
+                  <input id="roomInviteLink" type="text" readonly />
+                  <button class="btn btn-ghost btn-mini" id="roomInviteCopyLinkButton" type="button">Copy</button>
+                </div>
+              </label>
+
+              <label class="copy-field">
+                <span>Room code</span>
+                <div class="copy-row">
+                  <input id="roomInviteCode" type="text" readonly />
+                  <button class="btn btn-ghost btn-mini" id="roomInviteCopyCodeButton" type="button">Copy</button>
+                </div>
+              </label>
+
+              <label class="copy-field">
+                <span>Password</span>
+                <div class="copy-row">
+                  <input id="roomInvitePassword" type="text" readonly />
+                  <button class="btn btn-ghost btn-mini" id="roomInviteCopyPasswordButton" type="button">Copy</button>
+                </div>
+              </label>
+
+              <div class="invite-actions">
+                <button class="btn btn-secondary" id="roomInviteCopyTextButton" type="button">Copy invite text</button>
+              </div>
+
+              <div class="qr-frame">
+                <img id="roomQrImage" alt="QR code for the room invite" />
+              </div>
+            </div>
+          </section>
+
+          <section class="modal-section" id="roomSettingsSection">
+            <div class="section-head">
+              <div>
+                <p class="card-kicker">Host only</p>
+                <h3>Room settings</h3>
+              </div>
+            </div>
+
+            <form class="settings-form" id="roomSettingsForm">
+              <label>
+                <span>Room name</span>
+                <input id="roomSettingsName" type="text" maxlength="48" />
+              </label>
+              <label>
+                <span>Password</span>
+                <input id="roomSettingsPassword" type="password" minlength="4" maxlength="128" />
+              </label>
+              <label>
+                <span>Idle timeout in minutes</span>
+                <input id="roomSettingsExpiry" type="number" min="0" step="5" />
+              </label>
+              <p class="form-note compact">Set idle timeout to 0 to keep the room open forever when nobody is connected.</p>
+              <button class="btn btn-primary btn-block" id="roomSettingsSaveButton" type="submit">Save changes</button>
+            </form>
+          </section>
+        </div>
+      </section>
+    </div>
+
+    <div class="toast-layer" id="toastLayer" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>
